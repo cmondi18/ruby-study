@@ -1,9 +1,15 @@
-puts 'What is the argument?'
-a = gets.chomp
-puts 'What is the second argument?'
-b = gets.chomp
-puts 'What is the third argument?'
-c = gets.chomp
+puts 'What is the first argument (a)?'
+a = gets.chomp.to_f
+
+if a.zero?
+  puts 'first argument can\'t be zero, try again'
+  exit
+end
+
+puts 'What is the second argument (b)?'
+b = gets.chomp.to_f
+puts 'What is the third argument (c)?'
+c = gets.chomp.to_f
 
 d = b**2 - 4 * a * c
 
