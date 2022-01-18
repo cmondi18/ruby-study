@@ -15,4 +15,4 @@ months = { january: 31,
 days30_months = months.select { |_, days| days == 30 }
 
 print 'Months with 30 days are: '
-days30_months.each { |month, _| print "#{month} " }
+days30_months.each_key { |month| print "#{month} " }
