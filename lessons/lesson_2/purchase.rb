@@ -6,7 +6,7 @@ loop do
   break if product == 'Stop'
 
   unit_price = gets.chomp.to_f
-  amount = gets.chomp.to_i
+  amount = gets.chomp.to_f
 
   purchase_list[product] = { unit_price: unit_price, amount: amount}
 end
