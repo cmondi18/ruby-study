@@ -15,7 +15,7 @@ class Station
   end
 
   def accept_train(train)
-    @trains << train
+    @trains << train unless @trains.include?(train)
   end
 
   def send_train(train)
