@@ -233,7 +233,7 @@ class Menu
       puts 'Error. You type wrong number of the station'
     end
   end
-  
+
   def show_menu
     available_options = [
       '- Press 1 to create station',
