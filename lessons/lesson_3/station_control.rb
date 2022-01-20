@@ -1,5 +1,5 @@
 class Station
-  attr_reader :trains, :title
+  attr_reader :trains
 
   def initialize(title)
     @title = title
@@ -38,7 +38,7 @@ end
 
 class Train
   attr_accessor :speed
-  attr_reader :wagons_count, :type
+  attr_reader :wagons_count
 
   def initialize(train_number, type, wagons_count)
     @train_number = train_number
