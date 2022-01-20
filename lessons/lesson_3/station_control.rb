@@ -6,10 +6,6 @@ class Station
     @trains = []
   end
 
-  def trains_on_station
-    @trains
-  end
-
   def trains_by_type(type)
     @trains.select { |train| train.type == type }
   end
@@ -19,11 +15,7 @@ class Station
   end
 
   def send_train(train)
-    if @trains.include?(train)
-      @trains.delete(train)
-    else
-      puts "There is not #{train} in this station"
-    end
+    @trains.delete(train) if @trains.include?(train)
   end
 end
 
@@ -41,10 +33,6 @@ class Route
   def delete_intermediate_station(station)
     allowed_stations = @stations.slice(1..-1)
     @stations.delete(station) if allowed_stations.include?(station)
-  end
-
-  def show_stations
-    @stations.each { |station| puts station.title }
   end
 end
 
@@ -64,19 +52,11 @@ class Train
   end
 
   def add_wagon
-    if @speed.zero?
-      @wagons_count += 1
-    else
-      puts 'Your speed is not 0'
-    end
+    @wagons_count += 1 if @speed.zero?
   end
 
   def remove_wagon
-    if @speed.zero? && @wagons_count != 0
-      @wagons_count -= 1
-    else
-      puts "You can't remove wagon, because you don't have any of them or your speed is not 0"
-    end
+    @wagons_count -= 1 if @speed.zero? && @wagons_count != 0
   end
 
   def get_route(route)
@@ -85,60 +65,31 @@ class Train
     @current_station_index = 0
   end
 
-  def route?
-    if @route.nil?
-      puts "You don't have any routes"
-      false
-    else
-      true
-    end
-  end
-
   def current_station
-    @route.stations[@current_station_index] if route?
+    @route.stations[@current_station_index]
   end
 
   def next_station
-    if route?
-      if @route.stations[@current_station_index + 1].nil?
-        puts "You already on the finishing point and don't have next station"
-      else
-        @route.stations[@current_station_index + 1]
-      end
-    end
+    @route.stations[@current_station_index + 1]
   end
 
   def previous_station
-    if route?
-      if @current_station_index.zero?
-        puts "You at starting point and don't have previous station"
-      else
-        @route.stations[@current_station_index - 1]
-      end
-    end
+    @route.stations[@current_station_index - 1] unless @current_station_index.zero?
   end
 
   def move_to_next_station
-    if route?
-      if @route.stations[@current_station_index + 1].nil?
-        puts "You already on the finishing point and can't move to the next station"
-      else
-        current_station.send_train(self)
-        next_station.accept_train(self)
-        @current_station_index += 1
-      end
-    end
+    return unless next_station
+
+    current_station.send_train(self)
+    next_station.accept_train(self)
+    @current_station_index += 1
   end
 
   def move_to_previous_station
-    if route?
-      if @current_station_index.zero?
-        puts "You at starting point and can't move to the previous station"
-      else
-        current_station.send_train(self)
-        previous_station.accept_train(self)
-        @current_station_index -= 1
-      end
-    end
+    return unless previous_station
+
+    current_station.send_train(self)
+    previous_station.accept_train(self)
+    @current_station_index -= 1
   end
 end
