@@ -13,7 +13,7 @@ class Train
   end
 
   def add_wagon(wagon)
-    @wagons << wagon if wagon_compatible?
+    @wagons << wagon if wagon_compatible?(wagon)
   end
 
   def remove_wagon(wagon)

@@ -19,11 +19,11 @@ class Menu
 
   def station_create
     puts 'Type title/name of the new station'
-    title = gets.chomp
-    if station_exist?(title)
+    station_title = gets.chomp
+    if station_exist?(station_title)
       puts 'Error. This station is already created'
     else
-      station = Station.new(title)
+      station = Station.new(station_title)
       @stations << station
       puts "#{station} was created"
     end
@@ -35,11 +35,21 @@ class Menu
 
   def train_create
     puts 'Type train number'
-    number = gets.chomp.to_i
-    if train_exist?(number)
+    train_number = gets.chomp.to_i
+    if train_exist?(train_number)
       puts 'Error. This train is already created'
     else
-      train = Train.new(number)
+      puts 'Which type of the train do you want to create. \'P\' for passenger and \'C\' for cargo'
+      choice = gets.chomp.upcase
+      case choice
+      when 'P'
+        train = PassengerTrain.new(train_number)
+      when 'C'
+        train = CargoTrain.new(train_number)
+      else
+        puts 'Error. You type wrong type'
+        return
+      end
       @trains << train
       puts "#{train} was created"
     end
@@ -69,21 +79,21 @@ class Menu
       case choice
       when 'A'
         puts 'Type title of the station'
-        station = gets.chomp
-        if station_exist?(station)
-          route.add_intermediate_station(station)
-          puts "#{station} was successfully added to the #{route}"
+        station_title = gets.chomp
+        if station_exist?(station_title)
+          route.add_intermediate_station(station_title)
+          puts "#{station_title} was successfully added to the #{route}"
         else
-          puts "#{station} not found"
+          puts "#{station_title} not found"
         end
       when 'D'
         puts 'Type title of the station'
-        station = gets.chomp
-        if route.stations.include?(station)
-          route.stations.delete(station)
-          puts "#{station} was successfully deleted from the #{route}"
+        station_title = gets.chomp
+        if route.stations.include?(station_title)
+          route.stations.delete(station_title)
+          puts "#{station_title} was successfully deleted from the #{route}"
         else
-          puts "#{station} not found in the route"
+          puts "#{station_title} not found in the route"
         end
       else
         break
@@ -125,10 +135,105 @@ class Menu
       puts 'Error. This train is not exist'
       return
     end
+
+    train = @trains.find { |train| train.train_number == train_number }
+    puts 'Which type of the wagon do you want to add? \'P\' for passenger and \'C\' for cargo'
+    choice = gets.chomp.upcase
+    case choice
+    when 'P'
+      wagon = PassengerWagon.new
+    when 'C'
+      wagon = CargoWagon.new
+    else
+      puts 'Error. You type wrong type'
+      return
+    end
+
+    if train.add_wagon(wagon)
+      puts 'Train and wagon are successfully connected'
+    else
+      puts 'Error. Incompatible types of train and wagon'
+    end
   end
 
+  def remove_wagon_from_train
+    puts 'Type train number'
+    train_number = gets.chomp.to_i
+    unless train_exist?(train_number)
+      puts 'Error. This train is not exist'
+      return
+    end
 
+    train = @trains.find { |train| train.train_number == train_number }
 
+    unless train.wagons.any?
+      puts 'Train doesn\'t have any wagons'
+      return
+    end
+
+    puts 'Type number of the wagon that you want remove from the train'
+    # increase index to make more habitual to people format
+    train.wagons.each.with_index { |index| puts "№#{index + 1} Wagon" }
+    number = gets.chomp.to_i - 1
+    if train.wagons[number]
+      wagon = train.wagons[number]
+      train.remove_wagon(wagon)
+      puts 'Wagon was successfully removed'
+    else
+      puts 'Error. You type wrong number of the wagon'
+    end
+  end
+
+  def move_train
+    puts 'Type train number'
+    train_number = gets.chomp.to_i
+    unless train_exist?(train_number)
+      puts 'Error. This train is not exist'
+      return
+    end
+    train = @trains.find { |train| train.train_number == train_number }
+
+    puts 'In which side do you want to move the train? \'F\' - forward, \'B\' - back.'
+    side = gets.chomp.upcase
+    case side
+    when 'F'
+      if train.move_to_next_station
+        puts 'Choo-choo, moved to the next station'
+      else
+        puts 'Error. Something went wrong'
+      end
+    when 'B'
+      if train.move_to_previous_station
+        puts 'Choo-choo, moved to the previous station'
+      else
+        puts 'Error. Something went wrong'
+      end
+    else
+      puts 'Error. You type wrong option'
+    end
+  end
+
+  def show_stations
+    unless @stations.any?
+      puts 'There are no any stations'
+      return
+    end
+
+    puts 'Trains on which station do you want to see?'
+    @stations.each.with_index { |station, index| puts "№#{index + 1} Station #{station.title}" }
+    number = gets.chomp.to_i - 1
+    if @stations[number]
+      station = @stations[number]
+      unless station.trains.any?
+        puts 'There are not any trains on the station'
+        return
+      end
+      puts "There are trains at the station now: #{station.trains.each(&:train_number)}"
+    else
+      puts 'Error. You type wrong number of the station'
+    end
+  end
+  
   def show_menu
     available_options = [
       '- Press 1 to create station',
@@ -157,20 +262,17 @@ class Menu
         add_route_to_train
       when 5
         add_wagon_to_train
+      when 6
+        remove_wagon_from_train
+      when 7
+        move_train
+      when 8
+        show_stations
+      when 0
+        exit
+      else
+        next
       end
     end
-  end
-
-
-  # TODO: DELETE
-  def seed
-    train = Train.new(555)
-    @trains << train
-    spb = Station.new('spb')
-    msk = Station.new('msk')
-    @stations << spb
-    @stations << msk
-    route = Route.new(spb, msk)
-    @routes << route
   end
 end
