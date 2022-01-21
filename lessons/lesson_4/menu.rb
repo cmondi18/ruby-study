@@ -14,7 +14,6 @@ class Menu
     @stations = []
     @trains = []
     @routes = []
-    @wagons = []
   end
 
   def station_create
@@ -61,6 +60,11 @@ class Menu
   end
 
   def route_menu
+    unless @stations.size >= 2
+      puts 'Error. First create two or more stations'
+      return
+    end
+
     puts 'Type title of starting station'
     first_station_title = gets.chomp
     puts 'Type title of ending station'
@@ -125,8 +129,8 @@ class Menu
     # increase index to make more habitual to people format
     @routes.each.with_index { |route, index| puts "№#{index + 1}. route with stations #{route.stations.each(&:title)}" }
     number = gets.chomp.to_i - 1
-    if @routes[number]
-      route = @routes[number]
+    route = @routes[number]
+    if route
       train.get_route(route)
       puts 'Train successfully get route'
     else
@@ -180,8 +184,8 @@ class Menu
     # increase index to make more habitual to people format
     train.wagons.each.with_index { |index| puts "№#{index + 1} Wagon" }
     number = gets.chomp.to_i - 1
-    if train.wagons[number]
-      wagon = train.wagons[number]
+    wagon = train.wagons[number]
+    if wagon
       train.remove_wagon(wagon)
       puts 'Wagon was successfully removed'
     else
@@ -227,8 +231,8 @@ class Menu
     puts 'Trains on which station do you want to see?'
     @stations.each.with_index { |station, index| puts "№#{index + 1} Station #{station.title}" }
     number = gets.chomp.to_i - 1
-    if @stations[number]
-      station = @stations[number]
+    station = @stations[number]
+    if station
       unless station.trains.any?
         puts 'There are not any trains on the station'
         return
