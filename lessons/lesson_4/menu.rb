@@ -20,7 +20,7 @@ class Menu
   def station_create
     puts 'Type title/name of the new station'
     station_title = gets.chomp
-    if station_exist?(station_title)
+    if find_station_by_title(station_title)
       puts 'Error. This station is already created'
     else
       station = Station.new(station_title)
@@ -29,14 +29,15 @@ class Menu
     end
   end
 
-  def station_exist?(title)
+  def find_station_by_title(title)
     @stations.find { |station| station.title == title }
   end
 
   def train_create
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    if train_exist?(train_number)
+    train = find_train_by_number(train_number)
+    if train
       puts 'Error. This train is already created'
     else
       puts 'Which type of the train do you want to create. \'P\' for passenger and \'C\' for cargo'
@@ -55,16 +56,19 @@ class Menu
     end
   end
 
-  def train_exist?(number)
+  def find_train_by_number(number)
     @trains.find { |train| train.train_number == number }
   end
 
   def route_menu
     puts 'Type title of starting station'
-    first_station = gets.chomp
+    first_station_title = gets.chomp
     puts 'Type title of ending station'
-    last_station = gets.chomp
-    unless station_exist?(first_station) && station_exist?(last_station)
+    last_station_title = gets.chomp
+
+    first_station = find_station_by_title(first_station_title)
+    last_station = find_station_by_title(last_station_title)
+    unless first_station && last_station
       puts 'Error. One or two such stations do not exist'
       return
     end
@@ -80,8 +84,9 @@ class Menu
       when 'A'
         puts 'Type title of the station'
         station_title = gets.chomp
-        if station_exist?(station_title)
-          route.add_intermediate_station(station_title)
+        station = find_station_by_title(station_title)
+        if station
+          route.add_intermediate_station(station)
           puts "#{station_title} was successfully added to the #{route}"
         else
           puts "#{station_title} not found"
@@ -89,8 +94,9 @@ class Menu
       when 'D'
         puts 'Type title of the station'
         station_title = gets.chomp
-        if route.stations.include?(station_title)
-          route.stations.delete(station_title)
+        station = find_station_by_title(station_title)
+        if route.stations.include?(station)
+          route.stations.delete(station)
           puts "#{station_title} was successfully deleted from the #{route}"
         else
           puts "#{station_title} not found in the route"
@@ -109,12 +115,12 @@ class Menu
 
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    unless train_exist?(train_number)
+    train = find_train_by_number(train_number)
+    unless train
       puts 'Error. This train is not exist'
       return
     end
 
-    train = @trains.find { |train| train.train_number == train_number }
     puts 'Type number of the route that you want to add to the train'
     # increase index to make more habitual to people format
     @routes.each.with_index { |route, index| puts "№#{index + 1}. route with stations #{route.stations.each(&:title)}" }
@@ -131,12 +137,12 @@ class Menu
   def add_wagon_to_train
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    unless train_exist?(train_number)
+    train = find_train_by_number(train_number)
+    unless train
       puts 'Error. This train is not exist'
       return
     end
 
-    train = @trains.find { |train| train.train_number == train_number }
     puts 'Which type of the wagon do you want to add? \'P\' for passenger and \'C\' for cargo'
     choice = gets.chomp.upcase
     case choice
@@ -159,12 +165,11 @@ class Menu
   def remove_wagon_from_train
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    unless train_exist?(train_number)
+    train = find_train_by_number(train_number)
+    unless train
       puts 'Error. This train is not exist'
       return
     end
-
-    train = @trains.find { |train| train.train_number == train_number }
 
     unless train.wagons.any?
       puts 'Train doesn\'t have any wagons'
@@ -187,11 +192,11 @@ class Menu
   def move_train
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    unless train_exist?(train_number)
+    train = find_train_by_number(train_number)
+    unless train
       puts 'Error. This train is not exist'
       return
     end
-    train = @trains.find { |train| train.train_number == train_number }
 
     puts 'In which side do you want to move the train? \'F\' - forward, \'B\' - back.'
     side = gets.chomp.upcase
