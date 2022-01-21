@@ -16,6 +16,50 @@ class Menu
     @routes = []
   end
 
+  def show_menu
+    available_options = [
+      '- Press 1 to create station',
+      '- Press 2 to create train',
+      '- Press 3 to create route or add/delete stations in the route',
+      '- Press 4 to add route to the train',
+      '- Press 5 to add wagon to the train',
+      '- Press 6 to remove wagon from the train',
+      '- Press 7 to move train from one station to another',
+      '- Press 8 to see see stations and trains on them',
+      '- Press 0 to exit from the program'
+    ]
+
+    loop do
+      puts 'What do you want to do?'
+      available_options.each { |option| puts option }
+      choice = gets.chomp.to_i
+      case choice
+      when 1
+        station_create
+      when 2
+        train_create
+      when 3
+        route_menu
+      when 4
+        add_route_to_train
+      when 5
+        add_wagon_to_train
+      when 6
+        remove_wagon_from_train
+      when 7
+        move_train
+      when 8
+        show_stations
+      when 0
+        exit
+      else
+        next
+      end
+    end
+  end
+
+  private
+
   def station_create
     puts 'Type title/name of the new station'
     station_title = gets.chomp
@@ -127,7 +171,7 @@ class Menu
 
     puts 'Type number of the route that you want to add to the train'
     # increase index to make more habitual to people format
-    @routes.each.with_index { |route, index| puts "№#{index + 1}. route with stations #{route.stations.each(&:title)}" }
+    @routes.each.with_index { |route, index| puts "№#{index + 1}. route with stations #{route.stations.map(&:title)}" }
     number = gets.chomp.to_i - 1
     route = @routes[number]
     if route
@@ -182,7 +226,7 @@ class Menu
 
     puts 'Type number of the wagon that you want remove from the train'
     # increase index to make more habitual to people format
-    train.wagons.each.with_index { |index| puts "№#{index + 1} Wagon" }
+    train.wagons.each.with_index { |_, index| puts "№#{index + 1} Wagon" }
     number = gets.chomp.to_i - 1
     wagon = train.wagons[number]
     if wagon
@@ -199,6 +243,11 @@ class Menu
     train = find_train_by_number(train_number)
     unless train
       puts 'Error. This train is not exist'
+      return
+    end
+
+    if train.route.nil?
+      puts 'Train don\'t have any routes, first add it.'
       return
     end
 
@@ -237,51 +286,9 @@ class Menu
         puts 'There are not any trains on the station'
         return
       end
-      puts "There are trains at the station now: #{station.trains.each(&:train_number)}"
+      puts "There are trains at the station now: #{station.trains.map(&:train_number)}"
     else
       puts 'Error. You type wrong number of the station'
-    end
-  end
-
-  def show_menu
-    available_options = [
-      '- Press 1 to create station',
-      '- Press 2 to create train',
-      '- Press 3 to create route or add/delete stations in the route',
-      '- Press 4 to add route to the train',
-      '- Press 5 to add wagon to the train',
-      '- Press 6 to remove wagon from the train',
-      '- Press 7 to move train from one station to another',
-      '- Press 8 to see see stations and trains on them',
-      '- Press 0 to exit from the program'
-    ]
-
-    loop do
-      puts 'What do you want to do?'
-      available_options.each { |option| puts option }
-      choice = gets.chomp.to_i
-      case choice
-      when 1
-        station_create
-      when 2
-        train_create
-      when 3
-        route_menu
-      when 4
-        add_route_to_train
-      when 5
-        add_wagon_to_train
-      when 6
-        remove_wagon_from_train
-      when 7
-        move_train
-      when 8
-        show_stations
-      when 0
-        exit
-      else
-        next
-      end
     end
   end
 end

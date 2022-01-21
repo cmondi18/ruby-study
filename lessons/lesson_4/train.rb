@@ -1,6 +1,6 @@
 class Train
   attr_accessor :speed
-  attr_reader :train_number, :wagons
+  attr_reader :train_number, :wagons, :route, :type
 
   def initialize(train_number)
     @train_number = train_number
@@ -46,7 +46,7 @@ class Train
 
   # this method is used for add_wagon function
   def wagon_compatible?(wagon)
-    (instance_of?(PassengerTrain) && wagon.instance_of?(PassengerWagon)) || (instance_of?(CargoTrain) && wagon.instance_of?(CargoWagon))
+    @type == wagon.type
   end
 
   # these methods are used for move_to functions so could be protected
