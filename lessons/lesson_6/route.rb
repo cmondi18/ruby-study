@@ -5,6 +5,8 @@ class Route
 
   def initialize(from_station, to_station)
     @stations = [from_station, to_station]
+    validate!
+
     register_instances
   end
 
