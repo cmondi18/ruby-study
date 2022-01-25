@@ -12,7 +12,6 @@ require_relative 'wagon'
 class Menu
   def initialize
     @stations = []
-    @trains = []
     @routes = []
   end
 
@@ -86,7 +85,6 @@ class Menu
       puts 'Error. You type wrong type'
       return
     end
-    @trains << train
     puts "#{train} was created"
   end
 
@@ -149,7 +147,7 @@ class Menu
     end
 
     puts 'Type train number'
-    train_number = gets.chomp.to_i
+    train_number = gets.chomp
     train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
@@ -171,7 +169,7 @@ class Menu
 
   def add_wagon_to_train
     puts 'Type train number'
-    train_number = gets.chomp.to_i
+    train_number = gets.chomp
     train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
@@ -199,7 +197,7 @@ class Menu
 
   def remove_wagon_from_train
     puts 'Type train number'
-    train_number = gets.chomp.to_i
+    train_number = gets.chomp
     train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
@@ -226,7 +224,7 @@ class Menu
 
   def move_train
     puts 'Type train number'
-    train_number = gets.chomp.to_i
+    train_number = gets.chomp
     train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
