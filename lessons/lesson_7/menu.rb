@@ -165,13 +165,8 @@ class Menu
       return
     end
 
-    puts 'Type train number'
-    train_number = gets.chomp
-    train = Train.find(train_number)
-    unless train
-      puts 'Error. This train is not exist'
-      return
-    end
+    train = train_exist?
+    return unless train
 
     puts 'Type number of the route that you want to add to the train'
     # increase index to make more habitual to people format
@@ -212,13 +207,8 @@ class Menu
   end
 
   def add_wagon_to_train
-    puts 'Type train number'
-    train_number = gets.chomp
-    train = Train.find(train_number)
-    unless train
-      puts 'Error. This train is not exist'
-      return
-    end
+    train = train_exist?
+    return unless train
 
     puts 'Which type of the wagon do you want to add? \'P\' for passenger and \'C\' for cargo'
     choice = gets.chomp.upcase
@@ -244,27 +234,13 @@ class Menu
   end
 
   def remove_wagon_from_train
-    puts 'Type train number'
-    train_number = gets.chomp
-    train = Train.find(train_number)
-    unless train
-      puts 'Error. This train is not exist'
-      return
-    end
+    train = train_exist?
+    return unless train
 
-    unless train.wagons.any?
-      puts 'Train doesn\'t have any wagons'
-      return
-    end
+    return unless have_wagons?(train)
 
     puts 'Type number of the wagon that you want remove from the train'
-    # increase index to make more habitual to people format
-    if train.type == :passenger
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available seats: #{wagon.free_space}, occupied seats: #{wagon.occupied_space}" }
-    else
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available volume: #{wagon.free_space}, occupied volume: #{wagon.occupied_space}" }
-    end
-    train.each_wagon(&message_format)
+    display_train_wagons(train)
     number = gets.chomp.to_i - 1
     wagon = train.wagons[number]
     if wagon
@@ -276,27 +252,13 @@ class Menu
   end
 
   def take_space
-    puts 'Type train number'
-    train_number = gets.chomp
-    train = Train.find(train_number)
-    unless train
-      puts 'Error. This train is not exist'
-      return
-    end
+    train = train_exist?
+    return unless train
 
-    unless train.wagons.any?
-      puts 'Train doesn\'t have any wagons'
-      return
-    end
+    return unless have_wagons?(train)
 
     puts 'Write the number of the wagon to which you want to add passengers or cargo'
-    # increase index to make more habitual to people format
-    if train.type == :passenger
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available seats: #{wagon.free_space}, occupied seats: #{wagon.occupied_space}" }
-    else
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available volume: #{wagon.free_space}, occupied volume: #{wagon.occupied_space}" }
-    end
-    train.each_wagon(&message_format)
+    display_train_wagons(train)
     number = gets.chomp.to_i - 1
     wagon = train.wagons[number]
     if wagon.type == :passenger
@@ -309,35 +271,17 @@ class Menu
   end
 
   def show_wagons
-    puts 'Type train number'
-    train_number = gets.chomp
-    train = Train.find(train_number)
-    unless train
-      puts 'Error. This train is not exist'
-      return
-    end
+    train = train_exist?
+    return unless train
 
-    unless train.wagons.any?
-      puts 'Train doesn\'t have any wagons'
-      return
-    end
+    return unless have_wagons?(train)
 
-    if train.type == :passenger
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available seats: #{wagon.free_space}, occupied seats: #{wagon.occupied_space}" }
-    else
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available volume: #{wagon.free_space}, occupied volume: #{wagon.occupied_space}" }
-    end
-    train.each_wagon(&message_format)
+    display_train_wagons(train)
   end
 
   def move_train
-    puts 'Type train number'
-    train_number = gets.chomp
-    train = Train.find(train_number)
-    unless train
-      puts 'Error. This train is not exist'
-      return
-    end
+    train = train_exist?
+    return unless train
 
     if train.route.nil?
       puts 'Train don\'t have any routes, first add it.'
@@ -384,5 +328,28 @@ class Menu
     else
       puts 'Error. You type wrong number of the station'
     end
+  end
+
+  def train_exist?
+    puts 'Type train number'
+    train_number = gets.chomp
+    train = Train.find(train_number)
+    puts 'Error. This train is not exist' unless train
+    train
+  end
+
+  def have_wagons?(train)
+    puts 'Train doesn\'t have any wagons' unless train.wagons.any?
+    train.wagons.any?
+  end
+
+  def display_train_wagons(train)
+    # increase index to make more habitual to people format
+    if train.type == :passenger
+      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available seats: #{wagon.free_space}, occupied seats: #{wagon.occupied_space}" }
+    else
+      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available volume: #{wagon.free_space}, occupied volume: #{wagon.occupied_space}" }
+    end
+    train.each_wagon(&message_format)
   end
 end
