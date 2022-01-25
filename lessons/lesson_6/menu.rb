@@ -90,10 +90,6 @@ class Menu
     puts "#{train} was created"
   end
 
-  def find_train_by_number(number)
-    @trains.find { |train| train.train_number == number }
-  end
-
   def route_menu
     unless @stations.size >= 2
       puts 'Error. First create two or more stations'
@@ -154,7 +150,7 @@ class Menu
 
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    train = find_train_by_number(train_number)
+    train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
       return
@@ -176,7 +172,7 @@ class Menu
   def add_wagon_to_train
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    train = find_train_by_number(train_number)
+    train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
       return
@@ -204,7 +200,7 @@ class Menu
   def remove_wagon_from_train
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    train = find_train_by_number(train_number)
+    train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
       return
@@ -231,7 +227,7 @@ class Menu
   def move_train
     puts 'Type train number'
     train_number = gets.chomp.to_i
-    train = find_train_by_number(train_number)
+    train = Train.find(train_number)
     unless train
       puts 'Error. This train is not exist'
       return
