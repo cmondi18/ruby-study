@@ -4,8 +4,8 @@ require_relative 'data_error'
 require_relative 'menu'
 
 menu = Menu.new
+menu.seed
 begin
-  menu.seed
   menu.show_menu
 rescue DataError => e
   puts '*****'

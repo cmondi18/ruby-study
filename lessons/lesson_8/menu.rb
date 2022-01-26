@@ -16,18 +16,8 @@ class Menu
     @routes = []
   end
 
+  # rubocop:disable Metrics/MethodLength
   def show_menu
-    available_options = [
-      '- Press 1 to create station',
-      '- Press 2 to create train',
-      '- Press 3 to create route or add/delete stations in the route',
-      '- Press 4 to add route to the train',
-      '- Press 5 to open wagon menu',
-      '- Press 6 to move train from one station to another',
-      '- Press 7 to see see stations and trains on them',
-      '- Press 0 to exit from the program'
-    ]
-
     loop do
       puts 'What do you want to do?'
       available_options.each { |option| puts option }
@@ -36,7 +26,7 @@ class Menu
       when 1
         station_create
       when 2
-        train_create
+        create_train
       when 3
         route_menu
       when 4
@@ -76,8 +66,22 @@ class Menu
     cargo_train.get_route(route)
     puts 'Seeding is ended'
   end
+  # rubocop:enable Metrics/MethodLength
 
   private
+
+  def available_options
+    [
+      '- Press 1 to create station',
+      '- Press 2 to create train',
+      '- Press 3 to create route or add/delete stations in the route',
+      '- Press 4 to add route to the train',
+      '- Press 5 to open wagon menu',
+      '- Press 6 to move train from one station to another',
+      '- Press 7 to see see stations and trains on them',
+      '- Press 0 to exit from the program'
+    ]
+  end
 
   def station_create
     puts 'Type title/name of the new station'
@@ -91,12 +95,16 @@ class Menu
     @stations.find { |station| station.title == title }
   end
 
-  def train_create
+  def create_train
     puts 'Type train number'
     train_number = gets.chomp
     puts 'Which type of the train do you want to create. \'P\' for passenger and \'C\' for cargo'
     choice = gets.chomp.upcase
-    case choice
+    create_train_by_type(choice, train_number)
+  end
+
+  def create_train_by_type(type, train_number)
+    case type
     when 'P'
       train = PassengerTrain.new(train_number)
     when 'C'
@@ -114,6 +122,15 @@ class Menu
       return
     end
 
+    stations = ask_stations
+    return if stations.nil?
+
+    route = Route.new(stations[0], stations[1])
+    puts "#{route} was created" if @routes << route
+    additional_options(route)
+  end
+
+  def ask_stations
     puts 'Type title of starting station'
     first_station_title = gets.chomp
     puts 'Type title of ending station'
@@ -121,53 +138,66 @@ class Menu
 
     first_station = find_station_by_title(first_station_title)
     last_station = find_station_by_title(last_station_title)
-    unless first_station && last_station
+    if first_station && last_station
+      [first_station, last_station]
+    else
       puts 'Error. One or two such stations do not exist'
-      return
     end
+  end
 
-    route = Route.new(first_station, last_station)
-    @routes << route
-    puts "#{route} was created"
-
+  def additional_options(route)
     loop do
       puts 'If you want add station to the route press \'A\', if you want to delete station press \'D\','\
            ' if you want to exit press any other button'
       choice = gets.chomp.upcase
       case choice
       when 'A'
-        puts 'Type title of the station'
-        station_title = gets.chomp
-        station = find_station_by_title(station_title)
-        if station
-          puts "#{station_title} was successfully added to the #{route}" if route.add_intermediate_station(station)
-        else
-          puts "#{station_title} not found"
-        end
+        add_station_to_route(route)
       when 'D'
-        puts 'Type title of the station'
-        station_title = gets.chomp
-        station = find_station_by_title(station_title)
-        if route.stations.include?(station)
-          puts "#{station_title} was successfully deleted from the #{route}" if route.stations.delete(station)
-        else
-          puts "#{station_title} not found in the route"
-        end
+        delete_station_from_route(route)
       else
         break
       end
     end
   end
 
-  def add_route_to_train
-    unless @routes.any?
-      puts 'Error. There are not any routes'
-      return
+  def add_station_to_route(route)
+    puts 'Type title of the station'
+    station_title = gets.chomp
+    station = find_station_by_title(station_title)
+    if station
+      puts "#{station_title} was successfully added to the #{route}" if route.add_intermediate_station(station)
+    else
+      puts "#{station_title} not found"
     end
+  end
+
+  def delete_station_from_route(route)
+    puts 'Type title of the station'
+    station_title = gets.chomp
+    station = find_station_by_title(station_title)
+    if route.stations.include?(station)
+      puts "#{station_title} was successfully deleted from the #{route}" if route.stations.delete(station)
+    else
+      puts "#{station_title} not found in the route"
+    end
+  end
+
+  def add_route_to_train
+    return unless routes?
 
     train = train_exist?
     return unless train
 
+    get_route(train)
+  end
+
+  def routes?
+    puts 'Error. There are not any routes' unless @routes.any?
+    @routes.any?
+  end
+
+  def get_route(train)
     puts 'Type number of the route that you want to add to the train'
     # increase index to make more habitual to people format
     @routes.each.with_index { |route, index| puts "№#{index + 1}. route with stations #{route.stations.map(&:title)}" }
@@ -180,16 +210,19 @@ class Menu
     end
   end
 
-  def wagon_menu
-    available_options = [
+  def wagon_menu_options
+    puts 'What do you want to do?'
+    [
       '- Press 1 to add wagon to the train',
       '- Press 2 to remove wagon from the train',
       '- Press 3 to add passengers or cargo to the wagon',
       '- Press 4 to see all train wagons',
       '- Press 0 to exit from the program'
-    ]
-    puts 'What do you want to do?'
-    available_options.each { |option| puts option }
+    ].each { |option| puts option }
+  end
+
+  def wagon_menu
+    wagon_menu_options
     choice = gets.chomp.to_i
     case choice
     when 1
@@ -200,8 +233,6 @@ class Menu
       take_space
     when 4
       show_wagons
-    else
-      exit
     end
   end
 
@@ -209,22 +240,29 @@ class Menu
     train = train_exist?
     return unless train
 
-    puts 'Which type of the wagon do you want to add? \'P\' for passenger and \'C\' for cargo'
-    choice = gets.chomp.upcase
-    case choice
+    answers = type_and_volume_of_train
+    case answers[0]
     when 'P'
-      puts 'How many seats are available in the wagon?'
-      seats = gets.chomp.to_i
-      wagon = PassengerWagon.new(seats)
+      wagon = PassengerWagon.new(answers[1])
     when 'C'
-      puts 'How many tons is the volume of the wagon?'
-      volume = gets.chomp.to_i
-      wagon = CargoWagon.new(volume)
+      wagon = CargoWagon.new(answers[1])
     else
       puts 'Error. You type wrong type'
       return
     end
 
+    train_added?(train, wagon)
+  end
+
+  def type_and_volume_of_train
+    puts 'Which type of the wagon do you want to add? \'P\' for passenger and \'C\' for cargo'
+    type = gets.chomp.upcase
+    puts 'How many seats/tons are available in the wagon?'
+    volume = gets.chomp.to_i
+    [type, volume]
+  end
+
+  def train_added?(train, wagon)
     if train.add_wagon(wagon)
       puts 'Train and wagon are successfully connected'
     else
@@ -281,36 +319,27 @@ class Menu
     train = train_exist?
     return unless train
 
-    if train.route.nil?
-      puts 'Train don\'t have any routes, first add it.'
-      return
-    end
+    routes_on_train?(train)
 
     puts 'In which side do you want to move the train? \'F\' - forward, \'B\' - back.'
     side = gets.chomp.upcase
     case side
     when 'F'
-      if train.move_to_next_station
-        puts 'Choo-choo, moved to the next station'
-      else
-        puts 'Error. Something went wrong'
-      end
+      puts train.move_to_next_station ? 'Choo-choo, moved to the next station' : 'Error. Something went wrong'
     when 'B'
-      if train.move_to_previous_station
-        puts 'Choo-choo, moved to the previous station'
-      else
-        puts 'Error. Something went wrong'
-      end
+      puts train.move_to_previous_station ? 'Choo-choo, moved to the previous station' : 'Error. Something went wrong'
     else
       puts 'Error. You type wrong option'
     end
   end
 
+  def routes_on_train?(train)
+    puts 'Train don\'t have any routes, first add it.' if train.route.nil?
+    train.route
+  end
+
   def show_stations
-    unless @stations.any?
-      puts 'There are no any stations'
-      return
-    end
+    return unless stations?
 
     puts 'Trains on which station do you want to see?'
     @stations.each.with_index { |station, index| puts "№#{index + 1} Station #{station.title}" }
@@ -326,6 +355,11 @@ class Menu
     else
       puts 'Error. You type wrong number of the station'
     end
+  end
+
+  def stations?
+    puts 'There are no any stations' unless @stations.any?
+    @stations.any?
   end
 
   def train_exist?
