@@ -140,8 +140,7 @@ class Menu
         station_title = gets.chomp
         station = find_station_by_title(station_title)
         if station
-          route.add_intermediate_station(station)
-          puts "#{station_title} was successfully added to the #{route}"
+          puts "#{station_title} was successfully added to the #{route}" if route.add_intermediate_station(station)
         else
           puts "#{station_title} not found"
         end
@@ -150,8 +149,7 @@ class Menu
         station_title = gets.chomp
         station = find_station_by_title(station_title)
         if route.stations.include?(station)
-          route.stations.delete(station)
-          puts "#{station_title} was successfully deleted from the #{route}"
+          puts "#{station_title} was successfully deleted from the #{route}" if route.stations.delete(station)
         else
           puts "#{station_title} not found in the route"
         end
@@ -176,8 +174,7 @@ class Menu
     number = gets.chomp.to_i - 1
     route = @routes[number]
     if route
-      train.get_route(route)
-      puts 'Train successfully get route'
+      puts 'Train successfully get route' if train.get_route(route)
     else
       puts 'Error. You type wrong number of the route'
     end
@@ -246,8 +243,7 @@ class Menu
     number = gets.chomp.to_i - 1
     wagon = train.wagons[number]
     if wagon
-      train.remove_wagon(wagon)
-      puts 'Wagon was successfully removed'
+      puts 'Wagon was successfully removed' if train.remove_wagon(wagon)
     else
       puts 'Error. You type wrong number of the wagon'
     end
