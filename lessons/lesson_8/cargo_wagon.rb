@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require_relative 'wagon'
 
+# === CargoWagon ===
 class CargoWagon < Wagon
   def initialize(volume)
     super(volume)

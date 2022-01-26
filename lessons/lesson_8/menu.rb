@@ -9,6 +9,7 @@ require_relative 'station'
 require_relative 'train'
 require_relative 'wagon'
 
+# === Menu ===
 class Menu
   def initialize
     @stations = []
@@ -130,7 +131,8 @@ class Menu
     puts "#{route} was created"
 
     loop do
-      puts 'If you want add station to the route press \'A\', if you want to delete station press \'D\', if you want to exit press any other button'
+      puts 'If you want add station to the route press \'A\', if you want to delete station press \'D\','\
+           ' if you want to exit press any other button'
       choice = gets.chomp.upcase
       case choice
       when 'A'
@@ -237,7 +239,7 @@ class Menu
     train = train_exist?
     return unless train
 
-    return unless have_wagons?(train)
+    return unless wagons?(train)
 
     puts 'Type number of the wagon that you want remove from the train'
     display_train_wagons(train)
@@ -255,7 +257,7 @@ class Menu
     train = train_exist?
     return unless train
 
-    return unless have_wagons?(train)
+    return unless wagons?(train)
 
     puts 'Write the number of the wagon to which you want to add passengers or cargo'
     display_train_wagons(train)
@@ -274,7 +276,7 @@ class Menu
     train = train_exist?
     return unless train
 
-    return unless have_wagons?(train)
+    return unless wagons?(train)
 
     display_train_wagons(train)
   end
@@ -338,18 +340,25 @@ class Menu
     train
   end
 
-  def have_wagons?(train)
+  def wagons?(train)
     puts 'Train doesn\'t have any wagons' unless train.wagons.any?
     train.wagons.any?
   end
 
   def display_train_wagons(train)
     # increase index to make more habitual to people format
-    if train.type == :passenger
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available seats: #{wagon.free_space}, occupied seats: #{wagon.occupied_space}" }
-    else
-      message_format = ->(wagon, index) { puts "№#{index + 1} Wagon, type: #{wagon.type}, available volume: #{wagon.free_space}, occupied volume: #{wagon.occupied_space}" }
-    end
+    message_format =
+      if train.type == :passenger
+        lambda { |wagon, index|
+          puts "№#{index + 1} Wagon, type: #{wagon.type},"\
+               " available seats: #{wagon.free_space}, occupied seats: #{wagon.occupied_space}"
+        }
+      else
+        lambda { |wagon, index|
+          puts "№#{index + 1} Wagon, type: #{wagon.type},"\
+               " available volume: #{wagon.free_space}, occupied volume: #{wagon.occupied_space}"
+        }
+      end
     train.each_wagon(&message_format)
   end
 end

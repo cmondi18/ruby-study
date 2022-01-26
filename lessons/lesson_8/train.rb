@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 require_relative 'data_error'
 require_relative 'manufacturer'
 require_relative 'instance_counter'
 
+# === Train ===
 class Train
   include Manufacturer
   include InstanceCounter
@@ -10,7 +13,7 @@ class Train
   attr_reader :train_number, :wagons, :route, :type
 
   @@trains = []
-  NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i
+  NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i.freeze
 
   def self.find(train_number)
     @@trains.find { |train| train.train_number == train_number }
@@ -29,7 +32,7 @@ class Train
   def valid?
     validate!
     true
-  rescue
+  rescue StandardError
     false
   end
 
