@@ -18,7 +18,7 @@ class Route
   def validated?
     validate!
     true
-  rescue StandardError
+  rescue DataError
     false
   end
 

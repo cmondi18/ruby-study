@@ -3,17 +3,25 @@
 require_relative 'data_error'
 require_relative 'manufacturer'
 require_relative 'instance_counter'
+require_relative 'validation'
+require_relative 'accessors'
 
 # === Train ===
 class Train
   include Manufacturer
   include InstanceCounter
+  include Validation
+  extend Accessors
 
-  attr_accessor :speed
+  strong_attr_accessor :speed, Integer
   attr_reader :train_number, :wagons, :route, :type
+  attr_accessor_with_history :driver
+
+  NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i.freeze
+
+  validate :train_number, :format, NUMBER_FORMAT
 
   @@trains = []
-  NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i.freeze
 
   def self.find(train_number)
     @@trains.find { |train| train.train_number == train_number }
@@ -23,17 +31,11 @@ class Train
     @train_number = train_number
     @wagons = []
     @speed = 0
+    local_validate!
     validate!
 
     @@trains << self
     register_instances
-  end
-
-  def valid?
-    validate!
-    true
-  rescue StandardError
-    false
   end
 
   def stop
@@ -76,8 +78,7 @@ class Train
 
   protected
 
-  def validate!
-    raise DataError, 'Number of the train in the wrong format' if train_number !~ NUMBER_FORMAT
+  def local_validate!
     raise DataError, 'This train already created' if @@trains.find { |train| train.train_number == train_number }
   end
 

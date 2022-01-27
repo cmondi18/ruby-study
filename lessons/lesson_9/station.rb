@@ -1,12 +1,24 @@
 # frozen_string_literal: true
 
 require_relative 'data_error'
+require_relative 'instance_counter'
+require_relative 'validation'
+require_relative 'accessors'
 
 # === Station ===
 class Station
   include InstanceCounter
+  include Validation
+  extend Accessors
+
+  TITLE_FORMAT = /^.{6,}$/i.freeze
+
+  validate :title, :presence
+  validate :title, :presence, String
+  validate :title, :format, TITLE_FORMAT
 
   attr_reader :title, :trains
+  strong_attr_accessor :city, String
 
   @@stations = []
 
@@ -17,6 +29,7 @@ class Station
   def initialize(title)
     @title = title
     @trains = []
+    local_validate!
     validate!
 
     @@stations << self
@@ -26,7 +39,7 @@ class Station
   def valid?
     validate!
     true
-  rescue StandardError
+  rescue DataError
     false
   end
 
@@ -48,9 +61,7 @@ class Station
 
   protected
 
-  def validate!
-    raise DataError, 'Title can\'t be nil' if title.nil?
-    raise DataError, 'Title should be at least 5 symbols' if title.length < 5
+  def local_validate!
     raise DataError, 'This station already created' if @@stations.find { |station| station.title == title }
   end
 end
