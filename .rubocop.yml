@@ -7,16 +7,20 @@ Layout/LineLength:
 Metrics/ClassLength:
   Exclude:
     - 'lessons/lesson_8/menu.rb'
+    - 'lessons/lesson_9/menu.rb'
 
 Metrics/MethodLength:
   Max: 15
   Include:
     - 'lessons/lesson_8/menu.rb'
+    - 'lessons/lesson_9/menu.rb'
 
 Metrics/AbcSize:
   Exclude:
     - 'lessons/lesson_8/menu.rb'
+    - 'lessons/lesson_9/menu.rb'
 
 Metrics/CyclomaticComplexity:
   Exclude:
   - 'lessons/lesson_8/menu.rb'
+  - 'lessons/lesson_9/menu.rb'

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
+
 require_relative 'data_error'
 
 # === Accessors ===
 module Accessors
-
   def attr_accessor_with_history(*names)
     names.each do |name|
       var_name = "@#{name}".to_sym

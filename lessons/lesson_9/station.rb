@@ -17,8 +17,8 @@ class Station
   validate :title, :presence, String
   validate :title, :format, TITLE_FORMAT
 
-  attr_reader :title, :trains
   strong_attr_accessor :city, String
+  attr_reader :title, :trains
 
   @@stations = []
 

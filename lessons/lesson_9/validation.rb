@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require_relative 'data_error'
 
 # === Accessors ===
@@ -21,11 +22,13 @@ module Validation
   # === InstanceMethods ===
   module InstanceMethods
     def validate!
-      self.class.validations&.each do |validations_array|
-          validations_array.each do |var, type, arg|
-            send("#{type}_validate", instance_variable_get("@#{var}"), arg)
-          end
+      return if self.class.validations.nil?
+
+      self.class.validations.each do |validations_array|
+        validations_array.each do |var, type, arg|
+          send("#{type}_validate", instance_variable_get("@#{var}"), arg)
         end
+      end
     end
   end
 

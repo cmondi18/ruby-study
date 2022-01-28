@@ -14,8 +14,8 @@ class Train
   extend Accessors
 
   strong_attr_accessor :speed, Integer
-  attr_reader :train_number, :wagons, :route, :type
   attr_accessor_with_history :driver
+  attr_reader :train_number, :wagons, :route, :type
 
   NUMBER_FORMAT = /^[a-z0-9]{3}-?[a-z0-9]{2}$/i.freeze
 
